@@ -1,16 +1,33 @@
 import joi from 'joi';
+import sha1 from 'sha1';
 import { ObjectId } from 'mongodb';
 import clients from '../../clients';
 import model, { modelForUpdate } from './models';
 import errors from '../../enums/errors';
 
-class ListsServices {
+
+class UsersServices {
   constructor(collectionName) {
     this.COLLECTION_NAME = collectionName;
   }
 
   createOne(data) {
-    // console.log(data.description);
+    // Mr j'ai pas trouver la bonne syntax pour modifier l'object
+    // J'ai même essayer un object spread
+
+    const testValidate = joi.validate(data, model);
+    testValidate.value.password = sha1(testValidate.value.password);
+    // const modifiedValidatedData = {
+    //   ...testValidate,
+    //   password: 'le mot de pass modifié',
+    //
+    // };
+
+
+    console.log(testValidate.value.password);
+    console.log(sha1);
+    console.log(`tester : ${testValidate.firstName}`);
+
 
     return joi.validate(data, model).then(validatedData => clients.mongodb()
       .then(db => db.collection(this.COLLECTION_NAME).insertOne(validatedData))
@@ -71,4 +88,4 @@ class ListsServices {
   }
 }
 
-export default new ListsServices('lists');
+export default new UsersServices('users');
